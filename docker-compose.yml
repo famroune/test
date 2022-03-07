@@ -5,7 +5,7 @@ volumes:
     db-data:
 services:
     db:
-        image: mysql
+        image: mariadb
         container_name: db_docker_test
         restart: always
         volumes:
