@@ -1,0 +1,4 @@
+message.register.email: "email obligatoire"
+message.register.password: "mot de passe obligatoire"
+message.register.user: "Cet utilisateur n'existe pas"
+message.register.valid.password: "Mot de passe invalide"
