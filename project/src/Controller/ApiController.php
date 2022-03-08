@@ -176,65 +176,42 @@ class ApiController extends AbstractController
      */
     public function search(Request $request): ApiResponse
     {
-        $api = new Api('food','fr');
+        /**@var User $user */
+        $user = $this->getUser();
+        $exclusions = [];
+        if(count($user->getExclusions()) > 0) {
+            foreach($user->getExclusions() as $exclusion) {
+                array_push($exclusions, $exclusion->getEan());
+            }
+        } 
 
-        // TODO: Au moins un critère de recherche est obligatoire.
-
-        // critères
-        // $ingredients = $request->get("ingredients");
-        // $allergenes = $request->get("allergenes");
-        // $nutriscore = $request->get("nutriscore");
-        // $valeurs_nutri = $request->get("valeurs_nutri");
-
-        // $nom = $request->get("nom");
-        // $ean = $request->get('ean');
-        // $marque = $request->get('marque');
-        // $categorie = $request->get('categorie');
+        $api = new Api('food', 'fr');
 
         $search = $request->get('search');
 
-
         $products = $api->search($search);
 
-        $i = 0;
+        $results = [];
         foreach($products as $product){
 
             $data = $product->getData();
-            
-            dump("nom : " . $data["product_name"]);
 
-           dump("EAN : " . $data["code"]);
+            // dump($data);die();
 
-           dump("ingredients : " . $data["ingredients_text_fr"]);
-
-           dump('nutriscore : ' . $data["nutrition_grades"]);
-
-
-           // TODO
-            // "marque : ",
-            // "allergenes : ",
-            // "valeurs_nutri : ",
-            // "meilleur_substitut : ",
-            
-            $i++;
-
+            // retourne la liste des produits en excluant la liste d'exclusion de l'user s'il en a une
+            if(!in_array($data["code"], $exclusions)) {
+                array_push($results, [
+                    "nom" => $data["product_name"],
+                    "EAN" => $data["code"],
+                    "marque" => $data["brands"],
+                    "ingredients" => $data["ingredients_text_fr"],
+                    "allergenes" => $data["allergens"],
+                    "nutriscore" => $data["nutrition_grades"],
+                    "valeurs_nutri" => $data["nutriscore_data"],
+                ]);
+            }
         }
-
-        dump($i);
-
-        $datas = [
-            "nom" => "",
-            "EAN" => "",
-            "marque" => "",
-            "ingredients" => "",
-            "allergenes" => "",
-            "nutriscore" => "",
-            "valeurs_nutri" => "",
-            "meilleur_substitut" => ""
-        ];
-
-        // TODO: retourne la liste des produits en excluant la liste d'exclusion de l'user s'il en a une
-
-        return new ApiResponse("", $datas); 
+        
+        return new ApiResponse("", $results); 
     }
 }
