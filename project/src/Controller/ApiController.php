@@ -196,8 +196,6 @@ class ApiController extends AbstractController
 
             $data = $product->getData();
 
-            // dump($data);die();
-
             // retourne la liste des produits en excluant la liste d'exclusion de l'user s'il en a une
             if(!in_array($data["code"], $exclusions)) {
                 array_push($results, [
