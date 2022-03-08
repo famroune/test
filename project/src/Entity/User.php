@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -37,10 +38,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $password;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Favori::class, inversedBy="users")
+     */
+    private $favoris;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Exclusion::class, inversedBy="users")
+     */
+    private $exclusions;
+
    
 
     public function __construct()
     {
+        $this->favoris = new ArrayCollection();
+        $this->exclusions = new ArrayCollection();
     }
     
 
@@ -120,5 +133,53 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier()
     {
         
+    }
+
+    /**
+     * @return Collection<int, Favori>
+     */
+    public function getFavoris(): Collection
+    {
+        return $this->favoris;
+    }
+
+    public function addFavori(Favori $favori): self
+    {
+        if (!$this->favoris->contains($favori)) {
+            $this->favoris[] = $favori;
+        }
+
+        return $this;
+    }
+
+    public function removeFavori(Favori $favori): self
+    {
+        $this->favoris->removeElement($favori);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Exclusion>
+     */
+    public function getExclusions(): Collection
+    {
+        return $this->exclusions;
+    }
+
+    public function addExclusion(Exclusion $exclusion): self
+    {
+        if (!$this->exclusions->contains($exclusion)) {
+            $this->exclusions[] = $exclusion;
+        }
+
+        return $this;
+    }
+
+    public function removeExclusion(Exclusion $exclusion): self
+    {
+        $this->exclusions->removeElement($exclusion);
+
+        return $this;
     }
 }
